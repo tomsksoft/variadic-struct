@@ -10,18 +10,19 @@ project(variadic-struct
 # sources
 #-----------------------------------------------------------------------------
 
-set(sources
-	"include/varstruct/literal.h")
+include(GNUInstallDirs)
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
-list(TRANSFORM ${sources} PREPEND "${CMAKE_CURRENT_SOURCE_DIR}")
+set(sources
+	varstruct/literal.h)
+
+set(build_sources ${sources})
+set(install_sources ${sources})
+list(TRANSFORM build_sources PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+list(TRANSFORM install_sources PREPEND "${CMAKE_INSTALL_INCLUDEDIR}/")
 
 #-----------------------------------------------------------------------------
 # target
 #-----------------------------------------------------------------------------
-
-include(GNUInstallDirs)
-include(cmake/CheckFeatures.cmake)
 
 add_library(varstruct INTERFACE)
 
@@ -31,7 +32,8 @@ add_library(Tomsksoft::varstruct ALIAS varstruct)
 # adds library header files to IDE
 target_sources(varstruct
 	INTERFACE
-		"$<BUILD_INTERFACE:${sources}>")
+		"$<BUILD_INTERFACE:${build_sources}>"
+		"$<INSTALL_INTERFACE:${install_sources}>")
 
 target_include_directories(varstruct
 	INTERFACE
@@ -42,6 +44,7 @@ target_compile_features(varstruct
 	INTERFACE
 		cxx_std_17)
 
+include(cmake/CheckFeatures.cmake)
 check_string_literal_operator_template(HAVE_STRING_LITERAL_OPERATOR_TEMPLATE)
 
 target_compile_definitions(varstruct
