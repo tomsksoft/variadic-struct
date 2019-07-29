@@ -2,6 +2,7 @@
 #ifndef __VARIADIC_STRUCT_H__
 #define __VARIADIC_STRUCT_H__
 
+#include <cstddef>
 #include <cstdint>
 
 namespace varstruct {
