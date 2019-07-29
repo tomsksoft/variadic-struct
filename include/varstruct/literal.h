@@ -2,12 +2,7 @@
 #ifndef __VARIADIC_STRUCT_H__
 #define __VARIADIC_STRUCT_H__
 
-#include <any>
 #include <cstdint>
-#include <limits>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 
 namespace varstruct {
 
@@ -49,7 +44,7 @@ namespace varstruct {
 	>
 #endif
 
-	// Compile-time string to number conversion used for variadic struct field access.
+	// Field name string literal.
 	constexpr uint64_t operator""_(const char* fieldName, size_t)
 	{
 		return FnvHash(fieldName);
