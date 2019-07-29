@@ -1,4 +1,3 @@
-
 #ifndef __VARSTRUCT_LITERAL_H__
 #define __VARSTRUCT_LITERAL_H__
 

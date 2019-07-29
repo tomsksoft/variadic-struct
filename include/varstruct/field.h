@@ -1,4 +1,3 @@
-
 #ifndef __VARSTRUCT_FIELD_H__
 #define __VARSTRUCT_FIELD_H__
 
