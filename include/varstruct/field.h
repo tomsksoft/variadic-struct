@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef __VARSTRUCT_FIELD_H__
+#define __VARSTRUCT_FIELD_H__
 
 #include <varstruct/literal.h>
 
@@ -9,6 +10,8 @@
 #include <utility>
 
 namespace varstruct {
+
+	template<typename T> struct is_struct;
 
 	// Indicator that field is not initialized in constructor.
 	struct NullValue { };
@@ -85,7 +88,7 @@ namespace varstruct {
 		template<
 			uint64_t FieldId,
 			typename = typename std::enable_if<FieldId == Traits::Id()>::type>
-		constexpr const TValue&& value() const&&
+		constexpr const TValue&& value() const&& // this is for consistency with std::ref for example
 		{ return std::move(value_); }
 
 		template<
@@ -152,3 +155,5 @@ namespace varstruct {
 		bool isSet_;
 	};
 }
+
+#endif

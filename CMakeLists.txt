@@ -13,7 +13,9 @@ project(variadic-struct
 include(GNUInstallDirs)
 
 set(sources
-	varstruct/literal.h)
+	varstruct/field.h
+	varstruct/literal.h
+	varstruct/traits.h)
 
 set(build_sources ${sources})
 set(install_sources ${sources})

@@ -1,6 +1,6 @@
 
-#ifndef __VARIADIC_STRUCT_H__
-#define __VARIADIC_STRUCT_H__
+#ifndef __VARSTRUCT_LITERAL_H__
+#define __VARSTRUCT_LITERAL_H__
 
 #include <cstddef>
 #include <cstdint>
@@ -52,4 +52,4 @@ namespace varstruct {
 	}
 }
 
-#endif __VARIADIC_STRUCT_H__
+#endif
