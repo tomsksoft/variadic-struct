@@ -3,6 +3,9 @@ build/
 _build/
 cmake-build*/
 
+# Hidden directories
+.*/
+
 # Prerequisites
 *.d
 

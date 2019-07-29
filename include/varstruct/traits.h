@@ -5,6 +5,7 @@
 #include <varstruct/field.h>
 
 #include <type_traits>
+#include <utility>
 
 namespace varstruct {
 
@@ -78,7 +79,12 @@ namespace varstruct {
 
 	template<typename... TFields>
 	struct parent<Varstruct<TFields...>> {
-		using type = typename Varstruct<TFields...>::ParentType;
+		static_assert(sizeof...(TFields) < 0, "variadic struct has no parent");
+	};
+
+	template<typename... TParentFields, typename... TFields>
+	struct parent<Varstruct<Varstruct<TParentFields...>, TFields...>> {
+		using type = Varstruct<TParentFields...>;
 	};
 
 	template<typename TStruct>
@@ -110,6 +116,15 @@ namespace varstruct {
 
 	template<size_t I, typename TStruct>
 	constexpr const char* field_name_v = get_field<I, TStruct>::Name();
+
+	template<size_t I, typename TStruct>
+	using field_name_t = typename get_field<I, TStruct>::NameType;
+
+	template<size_t I, typename TStruct>
+	using field_type_t = typename get_field<I, TStruct>::ValueType;
+
+	template<size_t I, typename TStruct>
+	using field_descriptor_t = typename get_field<I, TStruct>::DescriptorType;
 
 	template<uint64_t Id, typename TName, typename TValue, typename TDescriptor, typename... TFields>
 	struct find_field_by_id<Id, Varstruct<Field<TName, TValue, TDescriptor>, TFields...>>:
@@ -169,13 +184,13 @@ namespace varstruct {
 namespace std {
 
 	template<typename... TFields>
-	class tuple_size<nem2_sdk::internal::VariadicStruct<TFields...>>:
-		public std::integral_constant<size_t, nem2_sdk::internal::struct_size<nem2_sdk::internal::VariadicStruct<TFields...>>::value>
+	class tuple_size<varstruct::Varstruct<TFields...>>:
+		public std::integral_constant<size_t, varstruct::size_v<varstruct::Varstruct<TFields...>>>
 	{ };
 
 	template<size_t I, typename... TFields>
-	struct tuple_element<I, nem2_sdk::internal::VariadicStruct<TFields...>> {
-		using type = typename nem2_sdk::internal::struct_field_by_index<I, nem2_sdk::internal::VariadicStruct<TFields...>>::ValueType;
+	struct tuple_element<I, varstruct::Varstruct<TFields...>> {
+		using type = varstruct::field_type_t<I, varstruct::Varstruct<TFields...>>;
 	};
 }
 
