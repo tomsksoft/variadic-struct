@@ -2,7 +2,6 @@
 #define __VARSTRUCT_STRUCT_H__
 
 #include <varstruct/field.h>
-#include <varstruct/literal.h>
 #include <varstruct/traits.h>
 
 #include <any>
@@ -57,9 +56,10 @@ namespace varstruct {
 
 		template<
 			typename... TArgs,
-			typename = typename std::enable_if<sizeof...(TArgs) > size_v<Type>>::type,
+			typename = typename std::enable_if<(sizeof...(TArgs) > size_v<Type>)>::type,
 			typename = typename std::enable_if<sizeof...(TArgs) != 1 || // should not hide default copy and move!
-			                                   !(std::is_same_v<std::decay_t<TArgs>, Type> && ...)>::type>
+			                                   !(std::is_same_v<std::decay_t<TArgs>, Type> && ...)>::type,
+			typename = void> // to distinguish from previous constructor
 		constexpr Varstruct(TArgs&&... args)
 		{ static_assert(sizeof...(TArgs) < 0, "invalid arguments count in variadic struct constructor"); }
 
@@ -106,9 +106,9 @@ namespace varstruct {
 
 		template<
 			typename... TArgs,
-			typename = typename std::enable_if<sizeof...(TArgs) <= size_v(Type)>::type,
+			typename = typename std::enable_if<sizeof...(TArgs) <= size_v<Type>>::type,
 			typename = typename std::enable_if<sizeof...(TArgs) != 1 || // should not hide default copy and move!
-
+			                                   !(std::is_same_v<std::decay_t<TArgs>, Type> && ...)>::type>
 		constexpr Varstruct(TArgs&&... args):
 			Varstruct(std::tuple_cat(std::forward_as_tuple(std::forward<TArgs>(args)...),
 			                         MakeTail(std::make_index_sequence<size_v<Type> - sizeof...(TArgs)>{})),
@@ -118,9 +118,10 @@ namespace varstruct {
 
 		template<
 			typename... TArgs,
-			typename = typename std::enable_if<sizeof...(TArgs) > size_v<Type>>::type,
+			typename = typename std::enable_if<(sizeof...(TArgs) > size_v<Type>)>::type,
 			typename = typename std::enable_if<sizeof...(TArgs) != 1 || // should not hide default copy and move!
-
+			                                   !(std::is_same_v<std::decay_t<TArgs>, Type> && ...)>::type,
+			typename = void> // to distinguish from previous constructor
 		constexpr Varstruct(TArgs&&... args)
 		{ static_assert(sizeof...(TArgs) < 0, "invalid arguments count in variadic struct constructor"); }
 
