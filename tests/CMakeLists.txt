@@ -28,3 +28,9 @@ add_subdirectory("${gtest_dir}/src"
                  EXCLUDE_FROM_ALL)
 
 # adding tests
+
+add_executable(varstruct_tests test_traits.cpp test_varstruct.cpp)
+target_link_libraries(varstruct_tests varstruct gtest gtest_main)
+
+include(GoogleTest)
+gtest_discover_tests(varstruct_tests)

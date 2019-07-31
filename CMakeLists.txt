@@ -14,7 +14,6 @@ include(GNUInstallDirs)
 
 set(sources
 	varstruct/field.h
-	varstruct/literal.h
 	varstruct/struct.h
 	varstruct/traits.h)
 
