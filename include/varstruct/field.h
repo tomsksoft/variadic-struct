@@ -23,36 +23,12 @@ namespace varstruct {
 		static constexpr const char Value[sizeof...(chars) + 1] = {chars..., '\0'};
 	};
 
-	// Macros for defining field name type from c-style string literal.
-#if VARSTRUCT_USE_STRING_LITERAL_OPERATOR_TEMPLATE
-
-	template<typename T, T... chars>
-	constexpr FieldName<chars...> operator""_fn()
-	{
-		return {};
-	}
-
-#define F_NAME(STR) decltype(STR##_fn)
-#else
-#define EXTRACT_CHAR(STR, IDX) (IDX < sizeof(STR)) ? STR[IDX] : '\0'
-#define F_NAME(STR) FieldName< \
-	EXTRACT_CHAR(STR, 0),  EXTRACT_CHAR(STR, 1),  EXTRACT_CHAR(STR, 2),  EXTRACT_CHAR(STR, 3),  EXTRACT_CHAR(STR, 4),  \
-	EXTRACT_CHAR(STR, 5),  EXTRACT_CHAR(STR, 6),  EXTRACT_CHAR(STR, 7),  EXTRACT_CHAR(STR, 8),  EXTRACT_CHAR(STR, 9),  \
-	EXTRACT_CHAR(STR, 10), EXTRACT_CHAR(STR, 11), EXTRACT_CHAR(STR, 12), EXTRACT_CHAR(STR, 13), EXTRACT_CHAR(STR, 14), \
-	EXTRACT_CHAR(STR, 15), EXTRACT_CHAR(STR, 16), EXTRACT_CHAR(STR, 17), EXTRACT_CHAR(STR, 18), EXTRACT_CHAR(STR, 19), \
-	EXTRACT_CHAR(STR, 20), EXTRACT_CHAR(STR, 21), EXTRACT_CHAR(STR, 22), EXTRACT_CHAR(STR, 23), EXTRACT_CHAR(STR, 24), \
-	EXTRACT_CHAR(STR, 25), EXTRACT_CHAR(STR, 26), EXTRACT_CHAR(STR, 27), EXTRACT_CHAR(STR, 28), EXTRACT_CHAR(STR, 29), \
-	EXTRACT_CHAR(STR, 30), EXTRACT_CHAR(STR, 31), EXTRACT_CHAR(STR, 32), EXTRACT_CHAR(STR, 33), EXTRACT_CHAR(STR, 34), \
-	EXTRACT_CHAR(STR, 35), EXTRACT_CHAR(STR, 36), EXTRACT_CHAR(STR, 37), EXTRACT_CHAR(STR, 38), EXTRACT_CHAR(STR, 39), \
-	EXTRACT_CHAR(STR, 40), EXTRACT_CHAR(STR, 41), EXTRACT_CHAR(STR, 42), EXTRACT_CHAR(STR, 43), EXTRACT_CHAR(STR, 44), \
-	EXTRACT_CHAR(STR, 45), EXTRACT_CHAR(STR, 46), EXTRACT_CHAR(STR, 47), EXTRACT_CHAR(STR, 48), EXTRACT_CHAR(STR, 49)  \
-	>
-#endif
-
-	// Literal for accessing fields in variadic struct.
-	constexpr uint64_t operator""_(const char* fieldName, size_t)
-	{
-		return FnvHash(fieldName);
+	namespace literal {
+		// Literal for accessing fields in variadic struct.
+		constexpr uint64_t operator""_(const char* fieldName, size_t)
+		{
+			return FnvHash(fieldName);
+		}
 	}
 
 	// Indicator that field is not initialized in constructor.
@@ -113,25 +89,33 @@ namespace varstruct {
 			uint64_t FieldId,
 			typename = typename std::enable_if<FieldId == Traits::Id()>::type>
 		constexpr TValue& value() &
-		{ return value_; }
+		{
+			return value_;
+		}
 
 		template<
 			uint64_t FieldId,
 			typename = typename std::enable_if<FieldId == Traits::Id()>::type>
 		constexpr const TValue& value() const&
-		{ return value_; }
+		{
+			return value_;
+		}
 
 		template<
 			uint64_t FieldId,
 			typename = typename std::enable_if<FieldId == Traits::Id()>::type>
 		constexpr TValue&& value() &&
-		{ return std::move(value_); }
+		{
+			return std::move(value_);
+		}
 
 		template<
 			uint64_t FieldId,
 			typename = typename std::enable_if<FieldId == Traits::Id()>::type>
 		constexpr const TValue&& value() const&& // this is for consistency with std::ref for example
-		{ return std::move(value_); }
+		{
+			return std::move(value_);
+		}
 
 		template<
 			uint64_t FieldId,
@@ -197,5 +181,31 @@ namespace varstruct {
 		bool isSet_;
 	};
 }
+
+// Macros for defining field name type from c-style string literal.
+#if VARSTRUCT_USE_STRING_LITERAL_OPERATOR_TEMPLATE
+
+	template<typename T, T... chars>
+	constexpr varstruct::FieldName<chars...> operator""_fname()
+	{
+		return {};
+	}
+
+#define F_NAME(STR) decltype(STR##_fname)
+#else
+#define EXTRACT_CHAR(STR, IDX) (IDX < sizeof(STR)) ? STR[IDX] : '\0'
+#define F_NAME(STR) FieldName< \
+	EXTRACT_CHAR(STR, 0),  EXTRACT_CHAR(STR, 1),  EXTRACT_CHAR(STR, 2),  EXTRACT_CHAR(STR, 3),  EXTRACT_CHAR(STR, 4),  \
+	EXTRACT_CHAR(STR, 5),  EXTRACT_CHAR(STR, 6),  EXTRACT_CHAR(STR, 7),  EXTRACT_CHAR(STR, 8),  EXTRACT_CHAR(STR, 9),  \
+	EXTRACT_CHAR(STR, 10), EXTRACT_CHAR(STR, 11), EXTRACT_CHAR(STR, 12), EXTRACT_CHAR(STR, 13), EXTRACT_CHAR(STR, 14), \
+	EXTRACT_CHAR(STR, 15), EXTRACT_CHAR(STR, 16), EXTRACT_CHAR(STR, 17), EXTRACT_CHAR(STR, 18), EXTRACT_CHAR(STR, 19), \
+	EXTRACT_CHAR(STR, 20), EXTRACT_CHAR(STR, 21), EXTRACT_CHAR(STR, 22), EXTRACT_CHAR(STR, 23), EXTRACT_CHAR(STR, 24), \
+	EXTRACT_CHAR(STR, 25), EXTRACT_CHAR(STR, 26), EXTRACT_CHAR(STR, 27), EXTRACT_CHAR(STR, 28), EXTRACT_CHAR(STR, 29), \
+	EXTRACT_CHAR(STR, 30), EXTRACT_CHAR(STR, 31), EXTRACT_CHAR(STR, 32), EXTRACT_CHAR(STR, 33), EXTRACT_CHAR(STR, 34), \
+	EXTRACT_CHAR(STR, 35), EXTRACT_CHAR(STR, 36), EXTRACT_CHAR(STR, 37), EXTRACT_CHAR(STR, 38), EXTRACT_CHAR(STR, 39), \
+	EXTRACT_CHAR(STR, 40), EXTRACT_CHAR(STR, 41), EXTRACT_CHAR(STR, 42), EXTRACT_CHAR(STR, 43), EXTRACT_CHAR(STR, 44), \
+	EXTRACT_CHAR(STR, 45), EXTRACT_CHAR(STR, 46), EXTRACT_CHAR(STR, 47), EXTRACT_CHAR(STR, 48), EXTRACT_CHAR(STR, 49)  \
+	>
+#endif
 
 #endif

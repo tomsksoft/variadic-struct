@@ -27,10 +27,29 @@ add_subdirectory("${gtest_dir}/src"
                  "${gtest_dir}/build"
                  EXCLUDE_FROM_ALL)
 
+# initializing command for compiling test targets
+
+set(COMPILE_COMMAND_PREFIX "${CMAKE_COMMAND} --build . --target ")
+configure_file(utils/compiler.h.in utils/compiler.h)
+
 # adding tests
 
-add_executable(varstruct_tests test_traits.cpp test_varstruct.cpp)
-target_link_libraries(varstruct_tests varstruct gtest gtest_main)
+add_subdirectory(assert-tests)
+
+add_executable(varstruct-test
+	test_traits.cpp
+	test_varstruct.cpp
+	utils/compiler.cpp)
+
+target_include_directories(varstruct-test
+	PRIVATE
+		"${CMAKE_CURRENT_BINARY_DIR}")
+
+target_link_libraries(varstruct-test
+	PRIVATE
+		varstruct
+		gtest
+		gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(varstruct_tests)
+gtest_discover_tests(varstruct-test)

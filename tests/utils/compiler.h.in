@@ -1,0 +1,17 @@
+#ifndef __VARSTRUCT_TEST_COMPILER__
+#define __VARSTRUCT_TEST_COMPILER__
+
+#define COMPILE_COMMAND_PREFIX "${COMPILE_COMMAND_PREFIX}"
+#define COMPILE_TEST_RESULT_DIR "${CMAKE_CURRENT_BINARY_DIR}"
+
+namespace varstruct { namespace test {
+
+	// Returns true if target with 'targetName' compiles.
+	bool Compiles(const char* targetName);
+
+	// Returns true if target with name 'targetName' does not compiles and specified
+	//static assert (if any) is found in error output.
+	bool FailsToCompile(const char* targetName, const char* expectedAssert = nullptr);
+}}
+
+#endif

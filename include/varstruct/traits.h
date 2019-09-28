@@ -3,6 +3,7 @@
 
 #include <varstruct/field.h>
 
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -31,6 +32,11 @@ namespace varstruct {
 	template<typename T>
 	constexpr bool is_struct_v = is_struct<T>::value;
 
+	template<typename TStruct>
+	struct size {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
+
 	template<typename... TFields>
 	struct size<Varstruct<TFields...>>: public std::integral_constant<size_t, sizeof...(TFields)>
 	{ };
@@ -42,6 +48,14 @@ namespace varstruct {
 
 	template<typename TStruct>
 	constexpr size_t size_v = size<TStruct>::value;
+
+	template<typename TName, typename TStruct> struct has_field {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
+
+	template<uint64_t Id, typename TStruct> struct has_field_by_id {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
 
 	template<uint64_t Id, typename TName, typename TValue, typename TDescriptor, typename... TFields>
 	struct has_field_by_id<Id, Varstruct<Field<TName, TValue, TDescriptor>, TFields...>>:
@@ -72,6 +86,10 @@ namespace varstruct {
 	template<typename TName, typename TStruct>
 	constexpr bool has_field_v = has_field<TName, TStruct>::value;
 
+	template<typename TStruct> struct parent {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
+
 	template<typename... TFields>
 	struct parent<Varstruct<TFields...>> {
 		static_assert(sizeof...(TFields) < 0, "variadic struct has no parent");
@@ -84,6 +102,10 @@ namespace varstruct {
 
 	template<typename TStruct>
 	using parent_t = typename parent<TStruct>::type;
+
+	template<size_t I, typename TStruct> struct get_field {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
 
 	template<size_t I, typename TName, typename TValue, typename TDescriptor, typename... TFields>
 	struct get_field<I, Varstruct<Field<TName, TValue, TDescriptor>, TFields...>> {
@@ -133,6 +155,14 @@ namespace varstruct {
 	template<size_t I, typename TStruct>
 	using field_descriptor_t = typename get_field_t<I, TStruct>::DescriptorType;
 
+	template<typename TName, typename TStruct> struct find_field {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
+
+	template<uint64_t Id, typename TStruct> struct find_field_by_id {
+		static_assert(sizeof(TStruct) == 0, "not a variadic struct");
+	};
+
 	template<uint64_t Id, typename TName, typename TValue, typename TDescriptor, typename... TFields>
 	struct find_field_by_id<Id, Varstruct<Field<TName, TValue, TDescriptor>, TFields...>> {
 	private:
@@ -181,7 +211,7 @@ namespace varstruct {
 	template<typename TName, typename TStruct>
 	using find_field_t = typename find_field<TName, TStruct>::type;
 
-	// Added for consistency with std::tuple.
+	// Added for structured binding support.
 
 	template<size_t I, typename... TFields>
 	constexpr auto get(const Varstruct<TFields...>& obj) ->
